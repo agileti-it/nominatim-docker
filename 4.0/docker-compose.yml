@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  nominatim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nominatim
+    restart: always
+    ports:
+      - "8080:8080"
+      - "5432:5432"
+    environment:
+      # see https://github.com/mediagis/nominatim-docker/tree/master/4.0#configuration for more options
+      PBF_URL: https://download.geofabrik.de/europe/great-britain-latest.osm.pbf
+      REPLICATION_URL: https://download.geofabrik.de/europe/great-britain-updates/
+      NOMINATIM_PASSWORD: jwzrVxBp2TcEyg
+      IMPORT_GB_POSTCODES: "true"
+      IMPORT_WIKIPEDIA: "true"
+    volumes:
+      - nominatim-data:/var/lib/postgresql/14/main
+    shm_size: 1gb
+
+volumes:
+  nominatim-data:

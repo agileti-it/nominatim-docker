@@ -6,6 +6,16 @@ ENV LANG C.UTF-8
 WORKDIR /app
 
 RUN true \
+    # Install all required packages.
+    && apt-get -y update -qq \
+    && apt-get -y install \
+       curl ca-certificates gnupg 
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
+RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+
+
+RUN true \
     # Do not start daemons after installation.
     && echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d \
     && chmod +x /usr/sbin/policy-rc.d \
@@ -32,9 +42,9 @@ RUN true \
         libboost-filesystem-dev \
         # PostgreSQL.
         postgresql-contrib \
-        postgresql-server-dev-12 \
-        postgresql-12-postgis-3 \
-        postgresql-12-postgis-3-scripts \
+        postgresql-server-dev-14 \
+        postgresql-14-postgis-3 \
+        postgresql-14-postgis-3-scripts \
         # PHP and Apache 2.
         php \
         php-intl \
@@ -62,8 +72,8 @@ RUN true \
 
 # Configure postgres.
 RUN true \
-    && echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/12/main/pg_hba.conf \
-    && echo "listen_addresses='*'" >> /etc/postgresql/12/main/postgresql.conf
+    && echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/14/main/pg_hba.conf \
+    && echo "listen_addresses='*'" >> /etc/postgresql/14/main/postgresql.conf
 
 # Osmium install to run continuous updates.
 RUN pip3 install osmium
@@ -94,7 +104,8 @@ RUN true \
         linux-libc-dev \
         libclang-*-dev \
         build-essential \
-        postgresql-server-dev-12 \
+        postgresql-server-dev-14 \
+        gnupg \
     && apt-get clean \
     # Clear temporary files and directories.
     && rm -rf \
@@ -112,8 +123,8 @@ RUN true \
 COPY conf.d/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
 # Postgres config overrides to improve import performance (but reduce crash recovery safety)
-COPY conf.d/postgres-import.conf /etc/postgresql/12/main/conf.d/
-COPY conf.d/postgres-tuning.conf /etc/postgresql/12/main/conf.d/
+COPY conf.d/postgres-import.conf /etc/postgresql/14/main/conf.d/
+COPY conf.d/postgres-tuning.conf /etc/postgresql/14/main/conf.d/
 
 COPY config.sh /app/config.sh
 COPY init.sh /app/init.sh

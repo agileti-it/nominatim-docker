@@ -14,7 +14,7 @@ else
   useradd -m -p ${NOMINATIM_PASSWORD} nominatim
 fi
 
-IMPORT_FINISHED=/var/lib/postgresql/12/main/import-finished
+IMPORT_FINISHED=/var/lib/postgresql/14/main/import-finished
 TOKENIZER_DIR=${PROJECT_DIR}/tokenizer
 
 if [ ! -f ${IMPORT_FINISHED} ]; then
@@ -32,7 +32,7 @@ if [ ! -d ${TOKENIZER_DIR} ]; then
   # configuration cleanly.
   # More reading: https://github.com/mediagis/nominatim-docker/pull/274/
   echo "No tokenizer configuration found. Copying from persistent volume into project directory."
-  cp -r /var/lib/postgresql/12/main/tokenizer ${TOKENIZER_DIR}
+  cp -r /var/lib/postgresql/14/main/tokenizer ${TOKENIZER_DIR}
   chown -R nominatim:nominatim ${PROJECT_DIR}
 fi
 
@@ -43,5 +43,5 @@ cd ${PROJECT_DIR} && sudo -E -u nominatim nominatim refresh --website --function
 service apache2 start
 
 # fork a process and wait for it
-tail -f /var/log/postgresql/postgresql-12-main.log &
+tail -f /var/log/postgresql/postgresql-14-main.log &
 wait

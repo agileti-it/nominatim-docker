@@ -51,9 +51,9 @@ fi
 
 
 # if we use a bind mount then the PG directory is empty and we have to create it
-if [ ! -f /var/lib/postgresql/12/main/PG_VERSION ]; then
-  chown postgres /var/lib/postgresql/12/main
-  sudo -u postgres /usr/lib/postgresql/12/bin/initdb -D /var/lib/postgresql/12/main
+if [ ! -f /var/lib/postgresql/14/main/PG_VERSION ]; then
+  chown postgres /var/lib/postgresql/14/main
+  sudo -u postgres /usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main
 fi
 
 sudo service postgresql start && \
@@ -97,7 +97,7 @@ sudo -E -u nominatim psql -d nominatim -c "ANALYZE VERBOSE"
 sudo service postgresql stop
 
 # Remove slightly unsafe postgres config overrides that made the import faster
-rm /etc/postgresql/12/main/conf.d/postgres-import.conf
+rm /etc/postgresql/14/main/conf.d/postgres-import.conf
 
 echo "Deleting downloaded dumps in ${PROJECT_DIR}"
 rm -f ${PROJECT_DIR}/*sql.gz
@@ -110,7 +110,7 @@ rm -f ${PROJECT_DIR}/tiger-nominatim-preprocessed.csv.tar.gz
 # this is of course a terrible hack but there is hope that 4.1 provides a way to restore this
 # configuration cleanly.
 # More reading: https://github.com/mediagis/nominatim-docker/pull/274/
-cp -r ${PROJECT_DIR}/tokenizer /var/lib/postgresql/12/main
+cp -r ${PROJECT_DIR}/tokenizer /var/lib/postgresql/14/main
 
 if [ "$PBF_URL" != "" ]; then
   rm -f ${OSMFILE}
